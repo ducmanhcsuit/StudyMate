@@ -100,7 +100,7 @@ Từ bước grilling đến `/to-tickets` nên giữ trong **cùng một phiên
 | `/grill-me` | Giống trên nhưng không ghi tài liệu. Dùng khi không làm trong repo | Bạn gọi | Bàn ý tưởng ngoài code, ví dụ cách chia việc trong nhóm |
 | `/grilling` | Phần lõi "hỏi dồn" mà hai skill trên dùng chung. Tự kích hoạt khi bạn nói "grill" | Claude tự gọi | Ít khi cần gọi trực tiếp |
 | `/to-spec` | Tổng hợp cuộc trò chuyện hiện tại thành spec và đưa lên nơi quản lý ticket. Không hỏi thêm | Bạn gọi | Sau khi grilling xong một tính năng |
-| `/to-tickets` | Chia spec hoặc kế hoạch thành các ticket nhỏ (mỗi ticket là một lát cắt chạy được từ đầu đến cuối), ghi rõ ticket nào phải chờ ticket nào | Bạn gọi | Chia việc cho TV1/TV2/TV3 mỗi tuần |
+| `/to-tickets` | Chia spec hoặc kế hoạch thành các ticket nhỏ (mỗi ticket là một lát cắt chạy được từ đầu đến cuối), ghi rõ ticket nào phải chờ ticket nào | Bạn gọi | Chia việc cho Mạnh/Dũng/Nhật mỗi tuần |
 | `/wayfinder` | Với việc quá lớn và còn mơ hồ (không gói gọn trong một phiên): vẽ bản đồ các quyết định cần đưa ra, giải quyết từng quyết định một. Kết quả là các quyết định, không phải code | Bạn gọi | Chỉ khi cả nhóm còn mù mờ về một mảng lớn. Tính năng đã rõ thì không dùng |
 | `/to-questionnaire` | Biến một quyết định bạn chưa tự trả lời được thành bảng câu hỏi để người khác điền | Bạn gọi | Cần hỏi ý giảng viên hoặc thành viên khác |
 | `/triage` | Phân loại issue và PR từ bên ngoài (bug report, yêu cầu tính năng), kiểm tra, rồi viết lại thành ticket mà agent làm được | Bạn gọi | Khi có bug report từ người dùng thử. Ticket do `/to-tickets` tạo thì không cần triage |

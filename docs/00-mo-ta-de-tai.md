@@ -9,7 +9,7 @@ StudyMate là nền tảng học tập có trợ lý AI. Sinh viên hỏi đáp 
 | Mục | Nội dung |
 | --- | --- |
 | Môn học | SE347 |
-| Nhóm | 3 thành viên: [TV1], [TV2], [TV3] |
+| Nhóm | 3 thành viên: Mạnh (AI, `ai/`), Dũng (backend, `server/`), Nhật (frontend, `client/`) |
 | Thời gian | 21/10/2026 – cuối 12/2026 (10 tuần), báo cáo tiến độ hằng tuần |
 | Công nghệ chính | React + TypeScript, Express, Python + FastAPI, PostgreSQL + pgvector, Gemini API |
 | Tính năng AI | Chatbot RAG có trích dẫn trang; sinh quiz trắc nghiệm dạng JSON |
@@ -52,22 +52,24 @@ Tài khoản mới đăng ký mặc định là Sinh viên. Admin cấp quyền 
 
 Mọi chức năng Bắt buộc phải xong trước tuần 8. Chức năng Điểm cộng chỉ làm khi còn thời gian.
 
-| Nhóm | Chức năng | Mức | Phụ trách |
+Nhóm chia việc theo thư mục: Mạnh làm `ai/`, Dũng làm `server/`, Nhật làm `client/`. Một chức năng thường cần nhiều người, mỗi người làm phần nằm trong thư mục của mình.
+
+| Nhóm | Chức năng | Mức | Người làm |
 | --- | --- | --- | --- |
-| Tài khoản | Đăng ký, đăng nhập (JWT), đổi mật khẩu, phân quyền 3 vai trò | Bắt buộc | TV1 |
-| Tài khoản | Đăng nhập bằng Google | Điểm cộng | TV1 |
-| Khóa học | Tạo, sửa, xóa khóa học; sinh mã lớp; sinh viên tham gia bằng mã | Bắt buộc | TV1 |
-| Tài liệu | Upload PDF, xử lý nền, hiển thị trạng thái, xem PDF theo trang | Bắt buộc | TV2 |
-| Tài liệu | Hỗ trợ DOCX/PPTX; OCR cho PDF scan | Điểm cộng | TV2 |
-| Chatbot | Hỏi đáp RAG có streaming, trích dẫn trang, lịch sử hội thoại, từ chối câu ngoài phạm vi | Bắt buộc | TV2 |
-| Chatbot | Hybrid search, viết lại câu hỏi nối tiếp | Bắt buộc | TV2 |
-| Chatbot | Reranking; gợi ý câu hỏi tiếp theo | Điểm cộng | TV2 |
-| Quiz | Sinh quiz bằng AI, giảng viên sửa/duyệt/xuất bản, sinh viên làm bài, chấm điểm tự động, xem giải thích | Bắt buộc | TV3 |
-| Quiz | Tự sinh flashcard | Điểm cộng | TV3 |
-| Thống kê | Dashboard giảng viên: điểm trung bình, câu sai nhiều nhất | Bắt buộc | TV3 |
-| Quản trị | Quản lý tài khoản, giới hạn lượt gọi AI, xem log chi phí | Bắt buộc | TV1 |
-| Vận hành | Docker Compose, CI trên GitHub Actions, deploy | Bắt buộc | TV3 |
-| Vận hành | Chạy script đánh giá RAG trên CI | Điểm cộng | TV3 |
+| Tài khoản | Đăng ký, đăng nhập (JWT), đổi mật khẩu, phân quyền 3 vai trò | Bắt buộc | Dũng, Nhật |
+| Tài khoản | Đăng nhập bằng Google | Điểm cộng | Dũng, Nhật |
+| Khóa học | Tạo, sửa, xóa khóa học; sinh mã lớp; sinh viên tham gia bằng mã | Bắt buộc | Dũng, Nhật |
+| Tài liệu | Upload PDF, xử lý nền, hiển thị trạng thái, xem PDF theo trang | Bắt buộc | Mạnh, Dũng, Nhật |
+| Tài liệu | Hỗ trợ DOCX/PPTX; OCR cho PDF scan | Điểm cộng | Mạnh |
+| Chatbot | Hỏi đáp RAG có streaming, trích dẫn trang, lịch sử hội thoại, từ chối câu ngoài phạm vi | Bắt buộc | Mạnh, Dũng, Nhật |
+| Chatbot | Hybrid search, viết lại câu hỏi nối tiếp | Bắt buộc | Mạnh |
+| Chatbot | Reranking; gợi ý câu hỏi tiếp theo | Điểm cộng | Mạnh, Nhật |
+| Quiz | Sinh quiz bằng AI, giảng viên sửa/duyệt/xuất bản, sinh viên làm bài, chấm điểm tự động, xem giải thích | Bắt buộc | Mạnh, Dũng, Nhật |
+| Quiz | Tự sinh flashcard | Điểm cộng | Mạnh, Dũng, Nhật |
+| Thống kê | Dashboard giảng viên: điểm trung bình, câu sai nhiều nhất | Bắt buộc | Dũng, Nhật |
+| Quản trị | Quản lý tài khoản, giới hạn lượt gọi AI, xem log chi phí | Bắt buộc | Dũng, Nhật |
+| Vận hành | Docker Compose, CI trên GitHub Actions, deploy | Bắt buộc | Dũng; Mạnh lo job CI và deploy của `ai/` |
+| Vận hành | Chạy script đánh giá RAG trên CI | Điểm cộng | Mạnh |
 
 **Ngoài phạm vi:** thanh toán, ứng dụng di động, chat realtime giữa người với người, tích hợp Moodle, xử lý video bài giảng.
 
@@ -175,7 +177,7 @@ Phần AI gồm ba khối: pipeline ingest tài liệu, chatbot RAG và sinh qui
 4. Nếu điểm tương đồng cao nhất thấp hơn ngưỡng [X], trả lời "không tìm thấy" và dừng, không gọi LLM.
 5. Dựng prompt: system prompt yêu cầu chỉ dùng ngữ cảnh được cung cấp; các chunk được đánh số [#1]…[#k] và bọc trong thẻ `<document>`.
 6. Service AI gọi [MODEL_CHAT] và stream SSE về backend; backend chuyển tiếp nguyên stream về frontend.
-7. Khi stream xong, backend đổi ID chunk được trích dẫn thành tài liệu và số trang, loại bỏ ID không hợp lệ, lưu tin nhắn và ghi log token.
+7. Trước khi gửi sự kiện `citations`, service AI loại bỏ ID chunk không nằm trong danh sách đã gửi cho model, rồi đổi các ID còn lại thành tài liệu và số trang. Backend chuyển tiếp nguyên stream; khi stream xong thì lưu tin nhắn kèm trích dẫn và ghi log token.
 
 **7.3. Sinh quiz**
 
@@ -285,20 +287,20 @@ gantt
 
 Deploy thử từ tuần 5 để phát hiện sớm lỗi streaming trên server. Sau mốc 15/12, nhóm chỉ sửa lỗi và làm Điểm cộng.
 
-**Phân công theo tuần.** Mỗi thành viên làm trọn chức năng của mình từ backend đến giao diện. TV1 phụ trách Auth, khóa học, Admin; TV2 phụ trách pipeline tài liệu và chatbot RAG; TV3 phụ trách quiz, dashboard và DevOps.
+**Phân công theo tuần.** Nhóm chia việc theo thư mục: Mạnh làm `ai/` (ingest, chatbot RAG, sinh quiz, đánh giá), Dũng làm `server/` (auth, khóa học, upload, chuyển tiếp stream, hạn mức, Admin, deploy), Nhật làm `client/` (toàn bộ giao diện). Mỗi tuần, ba người cùng làm các tầng của một chức năng để cuối tuần có bản demo chạy từ đầu đến cuối.
 
-| Tuần | TV1 | TV2 | TV3 | Sản phẩm báo cáo tuần |
+| Tuần | Mạnh (`ai/`) | Dũng (`server/`) | Nhật (`client/`) | Sản phẩm báo cáo tuần |
 | --- | --- | --- | --- | --- |
-| 1 (21/10) | Đặc tả, use case | PoC gọi LLM + embedding với câu hỏi tiếng Việt | ERD, danh sách API, tạo repo và quy tắc Git | Bộ tài liệu thiết kế, kết quả PoC |
-| 2 (28/10) | Đăng ký, đăng nhập JWT, phân quyền | Schema Prisma, migration pgvector | Docker Compose, CI, khung frontend/backend | Đăng nhập chạy được, CI xanh |
-| 3 (4/11) | CRUD khóa học, mã lớp, tham gia lớp | Upload PDF, parse theo trang | Layout chung, trang khóa học | Tạo khóa học và upload tài liệu |
-| 4 (11/11) | Quản lý thành viên lớp | Worker ingest, chunk, embedding, hybrid search | Trình xem PDF theo trang | Tìm kiếm trả đúng đoạn cho câu hỏi mẫu |
-| 5 (18/11) | Hạn mức câu hỏi, AiUsageLog | Chatbot RAG qua SSE, trích dẫn trang | Giao diện chat, deploy thử | Chat có trích dẫn trên bản deploy thử |
-| 6 (25/11) | Làm bài quiz, chấm điểm (phía sinh viên) | Viết lại câu hỏi nối tiếp, ngưỡng từ chối | Sinh quiz JSON + Zod, màn duyệt quiz | Sinh, duyệt và làm quiz |
-| 7 (2/12) | Trang Admin | Soạn golden set, script đánh giá | Dashboard giảng viên | Dashboard, Admin, số liệu đánh giá đầu tiên |
-| 8 (9/12) | Test, sửa lỗi, responsive | Chạy đánh giá trên 3 cấu hình | Test, sửa lỗi, responsive | Mọi chức năng Bắt buộc hoàn tất, bảng kết quả đánh giá |
-| 9 (16/12) | Dữ liệu mẫu (seed) | Điểm cộng nếu còn thời gian (reranking) | Deploy chính thức | Link deploy |
-| 10 (23/12) | Slide thuyết trình | Chương AI và đánh giá trong báo cáo | Video demo dự phòng | Báo cáo tổng kết, tập demo |
+| 1 (21/10) | PoC gọi LLM + embedding với câu hỏi tiếng Việt | ERD, danh sách API | Đặc tả, use case, quy tắc Git | Bộ tài liệu thiết kế, kết quả PoC |
+| 2 (28/10) | Khung FastAPI, cột `Chunk` + migration pgvector (cùng Dũng) | Đăng ký, đăng nhập JWT, phân quyền; Docker Compose, CI | Khung frontend, router, trang đăng nhập | Đăng nhập chạy được, CI xanh |
+| 3 (4/11) | Đọc PDF theo trang, chia đoạn | CRUD khóa học, mã lớp, tham gia lớp, upload PDF | Layout chung, trang khóa học, form upload | Tạo khóa học và upload tài liệu |
+| 4 (11/11) | Worker ingest, embedding, hybrid search | Quản lý thành viên lớp, API trạng thái tài liệu | Trình xem PDF theo trang, hiển thị trạng thái xử lý | Tìm kiếm trả đúng đoạn cho câu hỏi mẫu |
+| 5 (18/11) | Chatbot RAG stream SSE, trích dẫn trang | Chuyển tiếp SSE, lưu tin nhắn, hạn mức, AiUsageLog, deploy thử | Giao diện chat, đọc stream, hiện trích dẫn | Chat có trích dẫn trên bản deploy thử |
+| 6 (25/11) | Viết lại câu hỏi nối tiếp, ngưỡng từ chối, sinh quiz bằng structured output | API quiz: lưu DRAFT, duyệt, làm bài, chấm điểm | Màn duyệt quiz, màn làm bài | Sinh, duyệt và làm quiz |
+| 7 (2/12) | Soạn golden set, script đánh giá | API Admin, API thống kê | Dashboard giảng viên, trang Admin | Dashboard, Admin, số liệu đánh giá đầu tiên |
+| 8 (9/12) | Chạy đánh giá trên 3 cấu hình | Test, sửa lỗi | Test, sửa lỗi, responsive | Mọi chức năng Bắt buộc hoàn tất, bảng kết quả đánh giá |
+| 9 (16/12) | Điểm cộng nếu còn thời gian (reranking) | Dữ liệu mẫu (seed), deploy chính thức | Hoàn thiện giao diện, điểm cộng phía giao diện | Link deploy |
+| 10 (23/12) | Chương AI và đánh giá trong báo cáo | Slide thuyết trình | Video demo dự phòng | Báo cáo tổng kết, tập demo |
 
 Mỗi báo cáo tuần gồm: việc đã làm kèm link Pull Request, khó khăn gặp phải, và kế hoạch tuần sau.
 
@@ -342,5 +344,5 @@ Những điểm sau cần chốt trong tuần 1, trước khi viết code.
 - [ ] Nơi lưu file PDF: ổ đĩa server, Cloudinary hay Supabase Storage?
 - [ ] Chốt các tham số [X]: kích thước file tối đa, hạn mức câu hỏi mỗi ngày, top-k, ngưỡng similarity.
 - [ ] Bộ tài liệu dùng cho demo và golden set: slide môn nào, có cần xin phép giảng viên không?
-- [ ] Phân công chính thức: ai là TV1, TV2, TV3; ai phụ trách tổng hợp báo cáo tuần.
+- [x] Phân công chính thức: chia theo thư mục (Mạnh `ai/`, Dũng `server/`, Nhật `client/`); người điều phối tuần tổng hợp báo cáo, luân phiên.
 - [ ] Quy tắc làm việc với Git: đặt tên nhánh, số người review tối thiểu cho mỗi Pull Request.

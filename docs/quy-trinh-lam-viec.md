@@ -24,13 +24,13 @@ Mỗi quy tắc đều có nhãn cho biết nó đến từ đâu:
 
 | Vai trò | Người đảm nhận | Trách nhiệm | Nguồn |
 | --- | --- | --- | --- |
-| TV1 | [Tên] | Auth, khóa học, Admin | [Nhóm quy ước] theo [phân công](00-mo-ta-de-tai.md#11-kế-hoạch-và-phân-công) |
-| TV2 | [Tên] | Pipeline tài liệu, chatbot RAG | như trên |
-| TV3 | [Tên] | Quiz, dashboard, DevOps | như trên |
-| **Người điều phối tuần** | Luân phiên mỗi tuần: TV1 → TV2 → TV3 | Chủ trì họp đầu/cuối tuần, tổng hợp báo cáo tuần, nhắc PR chờ review | [Nhóm quy ước] |
+| AI | Mạnh | `ai/`: ingest, hybrid search, chat RAG, sinh quiz, đánh giá | [Nhóm quy ước] theo [phân công](00-mo-ta-de-tai.md#11-kế-hoạch-và-phân-công) |
+| Backend | Dũng | `server/`: auth, quyền, CRUD, upload, chuyển tiếp stream, hạn mức, Docker Compose, deploy | như trên |
+| Frontend | Nhật | `client/`: toàn bộ giao diện | như trên |
+| **Người điều phối tuần** | Luân phiên mỗi tuần: Mạnh → Dũng → Nhật | Chủ trì họp đầu/cuối tuần, tổng hợp báo cáo tuần, nhắc PR chờ review | [Nhóm quy ước] |
 | **Chủ repo** | [Tên], một người cố định | Quản lý cài đặt GitHub, mời thành viên, quản lý secret khi deploy | [Nhóm quy ước] |
 
-Mỗi người **làm trọn tính năng của mình từ backend đến giao diện**, không chia theo kiểu "người làm FE, người làm BE". [Nhóm quy ước]
+Mỗi người **chỉ sửa trong thư mục của mình**. Một chức năng cần nhiều tầng thì mỗi người làm phần của mình rồi ghép lại qua hợp đồng API. Phần dùng chung (`shared/`, `schema.prisma`, API nội bộ Express ↔ Python) phải được những người bị ảnh hưởng cùng đồng ý. [Nhóm quy ước]
 
 ---
 
@@ -208,7 +208,7 @@ File: `docs/bao-cao-tuan/tuan-N.md`, do người điều phối tuần tổng h�
 ## Kết quả
 | Thành viên | Việc đã xong (link PR đã merge) | Việc dở dang |
 | --- | --- | --- |
-| TV1 | ... | ... |
+| Mạnh | ... | ... |
 
 ## Demo
 <link deploy hoặc ảnh chụp màn hình>
