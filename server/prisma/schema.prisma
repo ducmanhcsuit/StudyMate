@@ -1,0 +1,204 @@
+// Theo docs/00-mo-ta-de-tai.md, mục 8.1 và docs/01-kien-truc-du-an.md
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum DocumentStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum QuizStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum MessageRole {
+  user
+  assistant
+}
+
+enum AiTask {
+  chat
+  quiz
+  embed
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  isLocked     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  courses      Course[]
+  enrollments  Enrollment[]
+  chatSessions ChatSession[]
+  quizzes      Quiz[]
+  attempts     Attempt[]
+  aiUsageLogs  AiUsageLog[]
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  joinCode    String   @unique
+  teacherId   String
+  createdAt   DateTime @default(now())
+
+  teacher      User          @relation(fields: [teacherId], references: [id])
+  enrollments  Enrollment[]
+  documents    Document[]
+  chatSessions ChatSession[]
+  quizzes      Quiz[]
+  aiUsageLogs  AiUsageLog[]
+}
+
+model Enrollment {
+  userId   String
+  courseId String
+  joinedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([userId, courseId])
+}
+
+model Document {
+  id        String         @id @default(uuid())
+  courseId  String
+  title     String
+  storageKey String
+  pageCount Int?
+  status    DocumentStatus @default(PENDING)
+  error     String?
+  createdAt DateTime       @default(now())
+
+  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  chunks Chunk[]
+
+  @@index([status])
+}
+
+model Chunk {
+  id             String                   @id @default(uuid())
+  documentId     String
+  page           Int
+  content        String
+  contentHash    String
+  // Python ghi cả hai cột bằng SQL thuần. gemini-embedding-2 cắt còn 768 chiều.
+  // ponytail: chưa có chỉ mục HNSW (embedding) và GIN (tsv), quét tuần tự đủ nhanh với vài nghìn chunk;
+  // thêm bằng migration --create-only khi DB chạy được, kiểm tra migrate dev không đòi xóa chúng
+  tsv            Unsupported("tsvector")?
+  embedding      Unsupported("vector(768)")?
+  embeddingModel String
+
+  document  Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  questions Question[]
+
+  @@index([documentId])
+}
+
+model ChatSession {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  title     String
+  createdAt DateTime @default(now())
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id        String      @id @default(uuid())
+  sessionId String
+  role      MessageRole
+  content   String
+  citations Json?
+  createdAt DateTime    @default(now())
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Quiz {
+  id        String     @id @default(uuid())
+  courseId  String
+  title     String
+  status    QuizStatus @default(DRAFT)
+  createdBy String
+  createdAt DateTime   @default(now())
+
+  course    Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  author    User       @relation(fields: [createdBy], references: [id])
+  questions Question[]
+  attempts  Attempt[]
+}
+
+model Question {
+  id            String  @id @default(uuid())
+  quizId        String
+  text          String
+  options       Json
+  answerIndex   Int
+  explanation   String
+  sourceChunkId String?
+
+  quiz        Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  sourceChunk Chunk?          @relation(fields: [sourceChunkId], references: [id], onDelete: SetNull)
+  answers     AttemptAnswer[]
+}
+
+model Attempt {
+  id          String    @id @default(uuid())
+  quizId      String
+  userId      String
+  score       Float?
+  submittedAt DateTime?
+
+  quiz    Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers AttemptAnswer[]
+}
+
+model AttemptAnswer {
+  id          String  @id @default(uuid())
+  attemptId   String
+  questionId  String
+  chosenIndex Int
+  isCorrect   Boolean
+
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model AiUsageLog {
+  id           String   @id @default(uuid())
+  userId       String
+  courseId     String?
+  task         AiTask
+  inputTokens  Int
+  outputTokens Int
+  createdAt    DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+}

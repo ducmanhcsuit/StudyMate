@@ -1,0 +1,9 @@
+{
+  "name": "studymate",
+  "private": true,
+  "workspaces": ["shared", "client", "server"],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
+    "lint": "npm run lint -w client && npm run typecheck -w server"
+  }
+}

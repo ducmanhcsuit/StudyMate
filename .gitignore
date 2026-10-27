@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+server/src/generated/
+server/uploads/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.claude/settings.local.json
