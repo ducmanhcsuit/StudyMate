@@ -59,7 +59,7 @@ Các quy tắc ranh giới:
 | Q20 | Luồng chat | Express lưu tin nhắn người dùng, gửi câu hỏi + 6 tin nhắn gần nhất + `courseId`; khi nhận `done` thì lưu câu trả lời và ghi `AiUsageLog` |
 | Q21 | Luồng sinh quiz | Request đồng bộ, không stream; dùng structured output của Gemini, kiểm tra bằng Pydantic rồi kiểm tra lại bằng Zod, lưu ở trạng thái `DRAFT` |
 | Q22 | Python đọc PDF | Đọc theo `storageKey`: khi dev đọc từ `UPLOAD_DIR`, khi deploy đọc từ Supabase bằng key chỉ có quyền đọc |
-| Q23 | Prompt injection | Bọc nội dung chunk trong thẻ phân cách; model không được cấp công cụ nào; ID trích dẫn phải nằm trong danh sách chunk đã gửi |
+| Q23 | Prompt injection | Bọc nội dung chunk trong thẻ phân cách; model không được cấp công cụ nào; ID trích dẫn phải nằm trong danh sách chunk đã gửi: Python loại ID lạ và ánh xạ sang `{chunkId, documentId, page}` trước khi gửi sự kiện `citations`, vì Express chuyển tiếp stream nguyên vẹn (Q16) và chỉ lưu lại |
 | Q24 | Hạn mức AI | Đếm `AiUsageLog` theo ngày: 50 câu chat và 10 lần sinh quiz mỗi người dùng, chỉnh được qua biến môi trường; vượt thì trả 429 |
 | Q25 | Cấu trúc `ai/` | Mỗi việc một file, chưa chia package con; file nào quá khoảng 300 dòng thì tách |
 | Q26 | Cấu trúc `server/` và `shared/` | Xem mục 3 |

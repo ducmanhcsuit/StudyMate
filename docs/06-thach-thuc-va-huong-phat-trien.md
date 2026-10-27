@@ -26,7 +26,7 @@ flowchart TD
         TH -- Không --> NF["Trả lời: tài liệu không đề cập"]
         TH -- Có --> PR["Dựng prompt với chunk [#1..#k]"]
         PR --> LLM["Gọi [MODEL_CHAT]<br/>stream qua SSE"]
-        LLM --> MAP["Backend map chunk ID → trang<br/>loại bỏ ID không hợp lệ"]
+        LLM --> MAP["Service AI map chunk ID → trang<br/>loại bỏ ID không hợp lệ"]
         MAP --> A[Câu trả lời + trích dẫn]
     end
 
@@ -94,7 +94,7 @@ Trạng thái được cập nhật theo tiến độ dự án. Tại thời đi
 
 | Vấn đề | Giải pháp | Trạng thái |
 |---|---|---|
-| **Trích dẫn sai trang:** mô hình tự sinh số trang không có thật | Đánh số chunk `[#1]…[#k]` trong prompt và yêu cầu chỉ trích dẫn theo số đó; backend ánh xạ ID sang tài liệu và số trang, loại bỏ mọi ID không thuộc tập đã truy xuất | [Dự kiến] |
+| **Trích dẫn sai trang:** mô hình tự sinh số trang không có thật | Đánh số chunk `[#1]…[#k]` trong prompt và yêu cầu chỉ trích dẫn theo số đó; service AI ánh xạ ID sang tài liệu và số trang, loại bỏ mọi ID không thuộc tập đã truy xuất, trước khi gửi sự kiện `citations` | [Dự kiến] |
 | **Câu hỏi ngoài phạm vi:** mô hình trả lời bằng kiến thức chung thay vì từ chối | Nếu điểm tương đồng cao nhất thấp hơn ngưỡng thì trả lời "tài liệu không đề cập" mà không gọi LLM; system prompt yêu cầu chỉ dùng ngữ cảnh được cung cấp; ngưỡng được hiệu chỉnh trên golden set | [Dự kiến] |
 | **Prompt injection trong tài liệu:** PDF chứa câu lệnh nhằm thay đổi hành vi mô hình | Bọc nội dung tài liệu trong thẻ `<document>`; system prompt quy định nội dung trong thẻ chỉ là dữ liệu tham khảo; chỉ giảng viên của khóa học được tải tài liệu lên | [Dự kiến] |
 | **Cô lập dữ liệu giữa các lớp:** sinh viên truy xuất được tài liệu của khóa học khác | Mọi truy vấn full-text và vector đều có điều kiện `courseId`; middleware kiểm tra quyền thành viên khóa học trước khi truy xuất | [Dự kiến] |
