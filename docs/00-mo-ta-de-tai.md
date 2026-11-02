@@ -173,8 +173,8 @@ Phần AI gồm ba khối: pipeline ingest tài liệu, chatbot RAG và sinh qui
 
 1. Kiểm tra sinh viên thuộc khóa học và còn hạn mức câu hỏi trong ngày.
 2. Nếu đã có lịch sử hội thoại, viết lại câu hỏi thành câu đầy đủ ngữ cảnh.
-3. Hybrid search trong phạm vi `courseId`: full-text search và vector search chạy song song, gộp bằng Reciprocal Rank Fusion, lấy top-k = [X].
-4. Nếu điểm tương đồng cao nhất thấp hơn ngưỡng [X], trả lời "không tìm thấy" và dừng, không gọi LLM.
+3. Hybrid search trong phạm vi `courseId`: full-text search và vector search chạy song song, gộp bằng Reciprocal Rank Fusion, lấy top-k = 5.
+4. Nếu cosine cao nhất trong kết quả vector search thấp hơn ngưỡng 0,65, trả lời "không tìm thấy" và dừng, không gọi LLM.
 5. Dựng prompt: system prompt yêu cầu chỉ dùng ngữ cảnh được cung cấp; các chunk được đánh số [#1]…[#k] và bọc trong thẻ `<document>`.
 6. Service AI gọi [MODEL_CHAT] và stream SSE về backend; backend chuyển tiếp nguyên stream về frontend.
 7. Trước khi gửi sự kiện `citations`, service AI loại bỏ ID chunk không nằm trong danh sách đã gửi cho model, rồi đổi các ID còn lại thành tài liệu và số trang. Backend chuyển tiếp nguyên stream; khi stream xong thì lưu tin nhắn kèm trích dẫn và ghi log token.
@@ -342,7 +342,7 @@ Những điểm sau cần chốt trong tuần 1, trước khi viết code.
 - [ ] Chốt đề tài StudyMate hay chuyển sang phương án dự phòng (Job portal có AI)?
 - [ ] Chọn nhà cung cấp và model cho chat và embedding sau PoC; kiểm tra hạn mức miễn phí trên tài liệu chính thức.
 - [ ] Nơi lưu file PDF: ổ đĩa server, Cloudinary hay Supabase Storage?
-- [ ] Chốt các tham số [X]: kích thước file tối đa, hạn mức câu hỏi mỗi ngày, top-k, ngưỡng similarity.
+- [ ] Chốt các tham số [X]: kích thước file tối đa, hạn mức câu hỏi mỗi ngày. (Top-k = 5, ngưỡng = 0,65: xong, Q29–Q30.)
 - [ ] Bộ tài liệu dùng cho demo và golden set: slide môn nào, có cần xin phép giảng viên không?
 - [x] Phân công chính thức: chia theo thư mục (Mạnh `ai/`, Dũng `server/`, Nhật `client/`); người điều phối tuần tổng hợp báo cáo, luân phiên.
 - [ ] Quy tắc làm việc với Git: đặt tên nhánh, số người review tối thiểu cho mỗi Pull Request.

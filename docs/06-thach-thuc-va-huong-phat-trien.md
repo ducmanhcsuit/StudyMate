@@ -22,7 +22,7 @@ flowchart TD
         Q[Sinh viên đặt câu hỏi] --> RW["Viết lại câu hỏi<br/>theo lịch sử hội thoại"]
         RW --> HS["Hybrid search trong courseId<br/>full-text + pgvector"]
         HS --> RRF[Gộp kết quả bằng RRF → top-k]
-        RRF --> TH{"Điểm cao nhất<br/>≥ ngưỡng?"}
+        RRF --> TH{"Cosine cao nhất (vector)<br/>≥ 0,65?"}
         TH -- Không --> NF["Trả lời: tài liệu không đề cập"]
         TH -- Có --> PR["Dựng prompt với chunk [#1..#k]"]
         PR --> LLM["Gọi [MODEL_CHAT]<br/>stream qua SSE"]

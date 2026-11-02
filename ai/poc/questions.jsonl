@@ -1,0 +1,22 @@
+{"id": "q01", "question": "HTTP là gì?", "type": "factual", "expected_answer": "Giao thức chuyển giao siêu văn bản giữa web server và trình duyệt", "expected_pages": ["chuong1.pdf:7"]}
+{"id": "q02", "question": "Thẻ p có CSS cục bộ và CSS nội tuyến thì cái nào được ưu tiên?", "type": "factual", "expected_answer": "CSS cục bộ được ưu tiên hơn nội tuyến và ngoại tuyến", "expected_pages": ["chuong3.pdf:11", "chuong3.pdf:13"]}
+{"id": "q03", "question": "External CSS", "type": "keyword", "expected_answer": "CSS ngoại tuyến: tách CSS ra file .css riêng", "expected_pages": ["chuong3.pdf:8", "chuong3.pdf:9", "chuong3.pdf:10"]}
+{"id": "o01", "question": "React hook useEffect dùng để làm gì?", "type": "out-of-scope", "expected_answer": "", "expected_pages": []}
+{"id": "o02", "question": "Cách nấu phở bò?", "type": "out-of-scope", "expected_answer": "", "expected_pages": []}
+{"id": "q04", "question": "Web Server và Web Client khác nhau thế nào?", "type": "factual", "expected_answer": "Server lưu website và trả kết quả khi có yêu cầu; client là máy dùng để truy cập, gửi yêu cầu và nhận kết quả", "expected_pages": ["chuong1.pdf:5"]}
+{"id": "q05", "question": "Kể tên vài trình duyệt web phổ biến", "type": "factual", "expected_answer": "Internet Explorer, Firefox, Opera, Chrome, Safari", "expected_pages": ["chuong1.pdf:6"]}
+{"id": "q06", "question": "Một địa chỉ URL đầy đủ gồm những thành phần nào?", "type": "factual", "expected_answer": "scheme, host, port, path, querystring", "expected_pages": ["chuong1.pdf:8"]}
+{"id": "q07", "question": "Trang web tĩnh có lấy dữ liệu từ database không?", "type": "factual", "expected_answer": "Không, web tĩnh viết bằng HTML và không kết nối CSDL", "expected_pages": ["chuong1.pdf:11"]}
+{"id": "q08", "question": "Vì sao web động thường chậm hơn web tĩnh?", "type": "factual", "expected_answer": "Xử lý tại server, mất thời gian để trả kết quả về trang web", "expected_pages": ["chuong1.pdf:16", "chuong1.pdf:13"]}
+{"id": "q09", "question": "Dùng CSS thì có lợi gì so với chỉ viết HTML?", "type": "factual", "expected_answer": "Tách trình bày khỏi nội dung, mã gọn hơn, tải nhanh hơn, đồng nhất phong cách, kiểm soát bố cục chính xác", "expected_pages": ["chuong3.pdf:4"]}
+{"id": "q10", "question": "Làm sao để gắn file style.css vào trang HTML?", "type": "factual", "expected_answer": "Tạo file .css rồi chèn khai báo liên kết trong phần head", "expected_pages": ["chuong3.pdf:9", "chuong3.pdf:10"]}
+{"id": "q11", "question": "Cú pháp viết một câu lệnh CSS như thế nào?", "type": "factual", "expected_answer": "Đối tượng { thuộc tính: giá trị; ... }", "expected_pages": ["chuong3.pdf:15"]}
+{"id": "q12", "question": "Class selector với Id selector khác nhau chỗ nào?", "type": "factual", "expected_answer": "Class dùng .tên cho nhóm thành phần, không phân biệt hoa thường; Id dùng #tên cho một thành phần, có phân biệt hoa thường", "expected_pages": ["chuong3.pdf:16", "chuong3.pdf:17", "chuong3.pdf:18"]}
+{"id": "q13", "question": "Muốn đổi giao diện cả website chỉ bằng cách sửa một chỗ thì nên dùng kiểu CSS nào?", "type": "factual", "expected_answer": "CSS ngoại tuyến (file .css riêng)", "expected_pages": ["chuong3.pdf:8"]}
+{"id": "q14", "question": "TCP/IP", "type": "keyword", "expected_answer": "Giao thức để các máy tính trên Internet trao đổi thông tin", "expected_pages": ["chuong1.pdf:3"]}
+{"id": "q15", "question": "querystring", "type": "keyword", "expected_answer": "Các tham số gửi kèm trong URL", "expected_pages": ["chuong1.pdf:8"]}
+{"id": "q16", "question": "Server-side script", "type": "keyword", "expected_answer": "Ngôn ngữ xử lý tại web server, dùng cho web động", "expected_pages": ["chuong1.pdf:14", "chuong1.pdf:15"]}
+{"id": "o03", "question": "Closure trong JavaScript là gì?", "type": "out-of-scope", "expected_answer": "", "expected_pages": []}
+{"id": "o04", "question": "Docker dùng để làm gì?", "type": "out-of-scope", "expected_answer": "", "expected_pages": []}
+{"id": "o05", "question": "HTTPS mã hoá dữ liệu bằng cách nào?", "type": "out-of-scope", "expected_answer": "", "expected_pages": []}
+{"id": "o06", "question": "Flexbox trong CSS căn giữa phần tử ra sao?", "type": "out-of-scope", "expected_answer": "", "expected_pages": []}

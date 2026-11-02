@@ -1,6 +1,6 @@
 # StudyMate – hướng dẫn cho AI
 
-StudyMate là nền tảng học tập có chatbot RAG trích dẫn trang và sinh quiz từ tài liệu khóa học. Đây là đồ án môn SE347 của nhóm 3 người. Kiến trúc và 27 quyết định đã chốt nằm ở `docs/01-kien-truc-du-an.md`: đọc file này trước khi thêm file, thư mục hoặc thư viện. Quy tắc Git ở `CONTRIBUTING.md`, các lệnh chạy ở `README.md`. Luôn trả lời bằng tiếng Việt.
+StudyMate là nền tảng học tập có chatbot RAG trích dẫn trang và sinh quiz từ tài liệu khóa học. Đây là đồ án môn SE347 của nhóm 3 người. Kiến trúc và 30 quyết định đã chốt nằm ở `docs/01-kien-truc-du-an.md`: đọc file này trước khi thêm file, thư mục hoặc thư viện. Quy tắc Git ở `CONTRIBUTING.md`, các lệnh chạy ở `README.md`. Luôn trả lời bằng tiếng Việt.
 
 ## Phân công
 
@@ -59,6 +59,7 @@ Người phụ trách duyệt xong mới viết code, và code phải bám đún
 
 - Prisma là nơi duy nhất tạo migration. Python chỉ đọc/ghi bảng `Chunk` và cập nhật `Document.status` bằng SQL thuần (psycopg). Các cột `tsv` và `embedding vector(768)` chỉ Python ghi.
 - Prisma 7: `migrate dev` không còn tự chạy `generate`. Deploy dùng `migrate deploy`.
+- PyMuPDF được ghim `1.27.2.3` trong `ai/pyproject.toml` (lý do nằm ở Q15). Đừng nâng lên 1.28.x hay 2.x khi chưa bàn lại.
 - Hợp đồng Express ↔ Python được chép tay ở hai nơi: Pydantic trong `ai/` và `shared/src/internal.ts`. Sửa một bên thì sửa cả bên kia trong cùng một PR.
 - `INTERNAL_KEY` trong `server/.env` và `ai/.env` phải giống nhau. Trình duyệt không bao giờ gọi thẳng vào `ai/`.
 - `shared/` phải được build thì server và client mới thấy thay đổi. Sau khi sửa, chạy `npm run build -w shared`.

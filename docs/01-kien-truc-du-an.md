@@ -51,7 +51,7 @@ Các quy tắc ranh giới:
 | Q12 | Chia việc Express / Python | Express: auth, quyền, CRUD, upload, chuyển tiếp stream. Python: ingest, tìm kiếm, sinh câu trả lời, sinh quiz, đánh giá |
 | Q13 | Schema DB | Prisma là chủ duy nhất; Python dùng SQL thuần (psycopg 3) |
 | Q14 | Ingest | Express gọi `POST /ingest/{id}` mà không chờ; Python xử lý ở background task; lúc khởi động quét lại `PENDING` và các bản ghi kẹt ở `PROCESSING` |
-| Q15 | Thư viện Python | FastAPI, Pydantic, google-genai, psycopg 3, PyMuPDF; không dùng LangChain/LlamaIndex; Ragas chỉ dùng cho đánh giá |
+| Q15 | Thư viện Python | FastAPI, Pydantic, google-genai, psycopg 3, PyMuPDF (ghim `1.27.2.3`: bản 2.0 nạp onnxruntime, tốn thêm ~77 MB RAM; 1.28.x có lỗi `get_text()` treo, issue #5082); không dùng LangChain/LlamaIndex; Ragas chỉ dùng cho đánh giá |
 | Q16 | Đường đi của stream | Python → SSE (`token`, `citations`, `done`, `error`) → Express chuyển tiếp nguyên vẹn → client đọc bằng `fetch` + `ReadableStream`; bỏ Vercel AI SDK |
 | Q17 | Embedding | `gemini-embedding-2`, 768 chiều, `vector(768)` + index HNSW |
 | Q18 | Công cụ Python | pytest + ruff; CI có thêm job Python; dev chạy bằng `uv run fastapi dev`; deploy là web service thứ hai trên Render free |
@@ -64,6 +64,11 @@ Các quy tắc ranh giới:
 | Q25 | Cấu trúc `ai/` | Mỗi việc một file, chưa chia package con; file nào quá khoảng 300 dòng thì tách |
 | Q26 | Cấu trúc `server/` và `shared/` | Xem mục 3 |
 | Q27 | Thư viện client | TanStack Query + React Hook Form |
+| Q28 | Chuẩn hóa chữ tiếng Việt | Chunk (lúc ingest) và câu hỏi (đầu `retrieve()`) đi qua cùng hàm `normalize_text()`: NFC, rồi đưa dấu thanh của vần oa/oe/uy cuối từ về kiểu òa/òe/ùy ("hoá" → "hóa"); chưa gộp i/y ("kĩ"/"kỹ") |
+| Q29 | Ngưỡng từ chối | So ngưỡng với cosine (`1 - (a <=> b)`) của chunk gần nhất trong danh sách vector search; không dùng điểm RRF (chỉ dựa trên thứ hạng) hay `ts_rank`. Dưới ngưỡng thì trả "tài liệu không đề cập" và không gọi LLM. Ngưỡng tạm **0,65** (PoC 02/11/2026: câu trong phạm vi có cosine top-1 ≥ 0,670, câu ngoài phạm vi ≤ 0,662); hiệu chỉnh lại trên golden set sau khi ingest thật bỏ trang trống, bìa, mục lục, chân trang |
+| Q30 | Top-k | Lấy 5 chunk sau RRF đưa vào prompt. PoC: Hit@3 = 16/16, nhưng có câu trả lời trải trên 2–3 trang liền nhau; mỗi chunk slide chỉ ~100–250 token |
+
+
 
 ## 3. Cấu trúc thư mục
 
@@ -101,6 +106,7 @@ studymate/
 │  │  ├─ retrieval.py          # viết lại câu hỏi, hybrid search, RRF, ngưỡng từ chối
 │  │  ├─ chat.py               # dựng prompt, stream SSE
 │  │  └─ quiz.py               # structured output
+│  ├─ poc/                     # script PoC tuần 1; xóa khi ingest.py/retrieval.py thay thế
 │  ├─ eval/
 │  │  ├─ golden.jsonl          # ~25 câu hỏi mẫu
 │  │  └─ run_eval.py           # Hit@k + Ragas
@@ -184,9 +190,9 @@ Render free tạm ngủ sau một thời gian không có truy cập, và project
 
 ## 7. Việc còn để PoC tuần 1 quyết định
 
-- Tên model chat Gemini cụ thể và hạn mức thật của gói miễn phí: kiểm tra trên AI Studio.
-- Ngưỡng tương đồng để từ chối câu hỏi ngoài phạm vi, và giá trị `k` của top-k.
-- Kiểm tra PyMuPDF trên slide thật của môn học.
+- Tên model chat Gemini cụ thể và hạn mức thật của gói miễn phí: kiểm tra trên AI Studio (PoC bước 3).
+- ~~Ngưỡng từ chối và top-k~~: đã chốt ở Q29 (0,65, tạm) và Q30 (k = 5).
+- ~~Kiểm tra PyMuPDF trên slide thật~~: xong, xem Q15 và `docs/poc-tuan-1.md` mục 1.
 
 ## 8. Đã dựng (27/10/2026)
 
