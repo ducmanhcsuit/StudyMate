@@ -5,6 +5,11 @@ description = "Service AI nội bộ của StudyMate: ingest, hybrid search, cha
 requires-python = ">=3.11"
 dependencies = [
     "fastapi[standard]>=0.162.0",
+    "google-genai>=2.33.0",
+    # ponytail: ghim vì 2.0 nạp onnxruntime ngay khi import (+77 MB RAM, Render free chỉ 512 MB)
+    # và 1.28.x có lỗi get_text() treo (#5082); nâng khi có bản 2.x không bắt buộc layout
+    # hoặc khi thật sự cần phân tích bố cục.
+    "pymupdf==1.27.2.3",
 ]
 
 [dependency-groups]
