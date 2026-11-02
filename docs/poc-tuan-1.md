@@ -22,6 +22,7 @@
 - Bỏ trang bìa (có thông tin cá nhân giảng viên).
 - Nội dung trong ảnh/sơ đồ bị mất (giới hạn đã biết, 06 §6.2.1).
 - Chunk chứa thẻ HTML → phải escape khi bọc trong <document> (Q23).
+- Sửa font nhúng sai bảng mã theo tên font (Chuong2 Palatino: |→à, }→â, {→á) trong page_text; dấu | thật ở font khác giữ nguyên.
 
 ## 2. Embedding Gemini với câu hỏi tiếng Việt
 - Model: gemini-embedding-2, 768 chiều; tài liệu gửi dạng "title: … | text: …", câu hỏi dạng "task: search result | query: …".

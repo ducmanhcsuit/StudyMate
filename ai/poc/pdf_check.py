@@ -15,6 +15,10 @@ EMPTY_CHARS = 20  # ít hơn chừng này ký tự thì coi là trang trống (s
 SAMPLE_PAGES = 5
 SPACE_GAP = 0.15  # khoảng trống giữa 2 ký tự > 0,15 × cỡ chữ thì coi là thiếu dấu cách
 
+# ponytail: Chuong2 nhúng font Palatino Linotype sai bảng mã (à→|, â→}, á→{); chỉ sửa đúng font này,
+# gặp font lỗi khác thì thêm bảng riêng, hoặc chuyển sang OCR trang đó.
+_PALATINO_FIX = str.maketrans({"|": "à", "}": "â", "{": "á"})
+
 _TONES = "\u0300\u0301\u0303\u0309\u0323"  # dấu huyền, sắc, ngã, hỏi, nặng (dạng tách rời)
 # Vần oa/oe/uy ở cuối từ, dấu thanh đặt trên chữ thứ hai (kiểu mới): "hoá", "khoẻ", "thuỷ".
 # Không bắt khi đứng sau q ("quý" đúng sẵn), cũng không bắt khi còn chữ hay dấu phụ phía sau ("hoàn", "hoặc").
@@ -37,11 +41,12 @@ def page_text(page: pymupdf.Page) -> str:
         for line in block.get("lines", []):  # block ảnh không có "lines"
             out, prev = [], None
             for span in line["spans"]:
+                fix = "Palatino" in span["font"]
                 for c in span["chars"]:
                     gap = c["bbox"][0] - prev["bbox"][2] if prev else 0.0
                     if prev and " " not in (prev["c"], c["c"]) and gap > SPACE_GAP * span["size"]:
                         out.append(" ")
-                    out.append(c["c"])
+                    out.append(c["c"].translate(_PALATINO_FIX) if fix else c["c"])
                     prev = c
             lines.append("".join(out))
     return normalize_text("\n".join(lines))
@@ -53,7 +58,8 @@ def page_title(page: pymupdf.Page) -> str:
     best_size, best_text = 0.0, ""
     for block in page.get_text("dict")["blocks"]:
         for line in block.get("lines", []):
-            text = "".join(s["text"] for s in line["spans"]).strip()
+            text = "".join(s["text"].translate(_PALATINO_FIX) if "Palatino" in s["font"] else s["text"]
+                for s in line["spans"]).strip()
             size = max((s["size"] for s in line["spans"]), default=0)
             if text and not text.isdigit() and size > best_size:  # bỏ qua số trang
                 best_size, best_text = size, text
