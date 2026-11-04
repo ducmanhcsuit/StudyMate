@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "prisma generate",
     "dev": "tsx watch --env-file=.env src/index.ts",
     "build": "prisma generate && tsc",
     "start": "node --env-file=.env dist/index.js",
