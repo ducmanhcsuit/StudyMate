@@ -38,9 +38,10 @@ Cần cài: Node 24, [uv](https://docs.astral.sh/uv/), Docker Desktop ([hướng
 ```bash
 npm install
 docker compose up -d                 # PostgreSQL + pgvector
-cp server/.env.example server/.env   # lần đầu
+cp server/.env.example server/.env   # lần đầu; điền JWT_SECRET, ADMIN_PASSWORD theo chú thích trong file
 cp ai/.env.example ai/.env           # lần đầu; INTERNAL_KEY giống server/.env
 npm run db:migrate -w server
+npm run db:seed -w server            # tạo tài khoản Admin theo ADMIN_EMAIL, ADMIN_PASSWORD
 ```
 
 Chạy ở 3 terminal:
@@ -57,6 +58,7 @@ Mở http://localhost:5173. Trang hiện `API OK · database OK · AI OK` là đ
 
 ```bash
 npm run lint && npm run build                  # client, server, shared
+npm test -w server                             # cần docker compose up -d; chạy trên database studymate_test
 cd ai && uv run ruff check && uv run pytest    # ai
 ```
 

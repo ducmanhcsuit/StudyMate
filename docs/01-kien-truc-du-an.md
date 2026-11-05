@@ -77,9 +77,11 @@ studymate/
 │  └─ features/{auth,course,document,chat,quiz,admin}/
 │                              # trang, component, hook của từng tính năng
 ├─ server/
-│  ├─ prisma/                  # schema.prisma + migrations (nguồn duy nhất)
+│  ├─ prisma/                  # schema.prisma + migrations (nguồn duy nhất), seed.ts
+│  ├─ test/                    # Vitest + Supertest, chạy trên database studymate_test
 │  └─ src/
-│     ├─ index.ts              # tạo app, gắn router
+│     ├─ index.ts              # mở cổng (listen)
+│     ├─ app.ts                # tạo app, gắn middleware và router; test import file này
 │     ├─ db.ts
 │     ├─ lib/
 │     │  ├─ auth.ts            # JWT, requireAuth, requireRole
@@ -91,6 +93,7 @@ studymate/
 ├─ shared/src/
 │  ├─ auth.ts  course.ts  quiz.ts
 │  ├─ chat.ts                  # định dạng trích dẫn, các loại sự kiện SSE
+│  ├─ errors.ts                # định dạng lỗi API { error: { code, message, fields } }
 │  └─ internal.ts              # hợp đồng Express ↔ Python
 ├─ ai/
 │  ├─ pyproject.toml  uv.lock  .env.example
