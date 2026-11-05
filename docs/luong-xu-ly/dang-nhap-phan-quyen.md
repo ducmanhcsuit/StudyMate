@@ -1,6 +1,6 @@
 # Luồng đăng nhập và phân quyền
 
-Trạng thái: **chờ duyệt** · Phần: `server/` · Soạn ngày 04/11/2026
+Trạng thái: **đã duyệt** 04/11/2026 (mục 5.9 duyệt bổ sung cùng ngày) · Phần: `server/` · Soạn ngày 04/11/2026
 
 Tài liệu mô tả đăng ký, đăng nhập, đăng xuất, đổi mật khẩu, hai middleware `requireAuth`/`requireRole` và cách tạo tài khoản Admin đầu tiên. Code phải bám đúng luồng này. Khi viết code mà thấy cần đổi luồng thì dừng lại, sửa tài liệu và xin duyệt lại (CLAUDE.md, nguyên tắc 2).
 
@@ -8,7 +8,7 @@ Ngoài phạm vi, sẽ có tài liệu riêng khi làm tới:
 
 - Quyền theo khóa học (sinh viên phải thuộc lớp, giảng viên phải là người tạo khóa): luồng khóa học.
 - Hạn mức AI (Q24): luồng hạn mức.
-- API Admin khóa tài khoản và đổi quyền (tuần 7). Ở đây chỉ quy định hệ quả: thay đổi có hiệu lực ngay từ request kế tiếp.
+- Phần còn lại của API Admin: danh sách tài khoản, log lượt gọi AI (tuần 7). Riêng đổi quyền và khóa tài khoản được làm sớm ở mục 5.9.
 
 ## 1. Quyết định làm nền
 
@@ -20,6 +20,9 @@ Ngoài phạm vi, sẽ có tài liệu riêng khi làm tới:
 | Kiểm tra người dùng | JWT chỉ chứa `userId`; mỗi request đọc lại `User` từ DB | Chốt 04/11/2026 |
 | Đổi mật khẩu | Phiên ở máy khác vẫn dùng được đến khi token hết hạn (`ponytail`) | Chốt 04/11/2026 |
 | Admin đầu tiên | `prisma db seed` đọc `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Chốt 04/11/2026 |
+| Họ tên | Chưa thu khi đăng ký; bảng `User` giữ nguyên | Duyệt 04/11/2026 |
+| Định dạng lỗi | `{ error: { code, message, fields } }`, schema ở `shared/src/errors.ts` | Duyệt 04/11/2026 |
+| Đổi quyền, khóa tài khoản | Làm sớm `PATCH /api/admin/users/:id` ngay trong nhánh auth | Duyệt 04/11/2026 |
 
 ## 2. API
 
@@ -32,12 +35,13 @@ Mọi đường dẫn có tiền tố `/api`; trình duyệt gọi qua proxy cù
 | POST | `/api/auth/logout` | Không | | `204`, xóa cookie | |
 | GET | `/api/auth/me` | Có | | `200 { user }` | 401, 403 |
 | POST | `/api/auth/change-password` | Có | `{ currentPassword, newPassword }` | `204` | 400, 401, 403 |
+| PATCH | `/api/admin/users/:id` | Có, chỉ ADMIN | `{ role?, isLocked? }` | `200 { user }`, có thêm `isLocked` | 400, 401, 403, 404 |
 
-`user` luôn có dạng `{ id, email, role }`. Không bao giờ trả `passwordHash` hay `isLocked`.
+`user` luôn có dạng `{ id, email, role }`. Không bao giờ trả `passwordHash`; `isLocked` chỉ trả cho Admin (mục 5.9).
 
 ## 3. Định dạng dùng chung với client
 
-Phần này nằm ở `shared/`, nên cần Nhật đồng ý trước khi viết code.
+Phần này nằm ở `shared/`. Định dạng đã được duyệt; Nhật xác nhận lại khi review PR.
 
 **Schema Zod trong `shared/src/auth.ts`:**
 
@@ -47,6 +51,8 @@ Phần này nằm ở `shared/`, nên cần Nhật đồng ý trước khi viế
 | `loginRequest` | `email`, `password` | Email theo mục 4.1; mật khẩu theo quy tắc "mật khẩu đã có" ở mục 4.2 |
 | `changePasswordRequest` | `currentPassword`, `newPassword` | Lần lượt theo quy tắc "mật khẩu đã có" và "mật khẩu mới" |
 | `authUser` | `id`, `email`, `role` | Dạng `user` ở mục 2 |
+| `updateUserRequest` | `role`, `isLocked` | Cả hai đều không bắt buộc nhưng phải có ít nhất một; `role` là `STUDENT`, `TEACHER` hoặc `ADMIN` |
+| `adminUser` | `id`, `email`, `role`, `isLocked` | Dạng `user` mà API Admin trả |
 
 **Định dạng lỗi** do `lib/errors.ts` trả về; đề xuất đặt schema ở file mới `shared/src/errors.ts`:
 
@@ -72,6 +78,7 @@ Phần này nằm ở `shared/`, nên cần Nhật đồng ý trước khi viế
 | 401 | `INVALID_CREDENTIALS` | Đăng nhập sai email hoặc mật khẩu |
 | 403 | `ACCOUNT_LOCKED` | Tài khoản bị khóa |
 | 403 | `FORBIDDEN` | Đã đăng nhập nhưng không đủ quyền |
+| 404 | `NOT_FOUND` | Không tìm thấy thứ cần sửa, ví dụ user ở mục 5.9 |
 | 409 | `EMAIL_TAKEN` | Email đã được đăng ký |
 | 500 | `INTERNAL` | Lỗi không lường trước; không trả stack trace |
 
@@ -225,6 +232,20 @@ Xóa cookie, trả 204. Không cần đăng nhập và gọi nhiều lần vẫn
 - Chạy lại bao nhiêu lần cũng không sinh bản ghi trùng. Bước 2 không ghi đè mật khẩu, để lỡ chạy lại seed cũng không mất mật khẩu mà Admin đã đổi.
 - Cách chạy seed trên môi trường deploy sẽ chốt ở tuần deploy.
 
+### 5.9. Admin đổi quyền hoặc khóa tài khoản: `PATCH /api/admin/users/:id`
+
+| # | Input | Xử lý | Output hoặc lỗi |
+| --- | --- | --- | --- |
+| 1 | Cookie | `requireAuth`, rồi `requireRole("ADMIN")` | 401 hoặc 403 như mục 5.3 và 5.4 |
+| 2 | Body JSON | Parse bằng `updateUserRequest` | Sai, hoặc không có trường nào: 400 |
+| 3 | `:id`, `req.user.id` | Không cho Admin tự sửa chính mình | Trùng nhau: 403 `FORBIDDEN` |
+| 4 | `:id`, body | Cập nhật `role` và/hoặc `isLocked` của `User` theo `id` | Không có user (Prisma báo `P2025`): 404 `NOT_FOUND` |
+| 5 | | | `200 { user }` theo dạng `adminUser` |
+
+- Bước 3 tránh trường hợp Admin duy nhất lỡ tự hạ quyền hoặc tự khóa mình, khiến không còn ai quản trị. Muốn sửa một Admin thì dùng tài khoản Admin khác.
+- Thay đổi có hiệu lực ngay từ request kế tiếp của người bị sửa, vì `requireAuth` đọc lại DB (mục 5.3); không cần thu hồi token.
+- Endpoint này không đụng tới khóa học. Hạ một Giảng viên xuống Sinh viên thì các khóa học họ đã tạo vẫn còn; xử lý quyền sở hữu khi đó sẽ bàn ở luồng khóa học.
+
 ## 6. Dữ liệu đọc và ghi
 
 | Luồng | Đọc | Ghi |
@@ -234,6 +255,7 @@ Xóa cookie, trả 204. Không cần đăng nhập và gọi nhiều lần vẫn
 | `requireAuth` | `User` theo `id` | |
 | Đổi mật khẩu | `User.passwordHash` | `User.passwordHash` |
 | Seed | `User` theo `email` | `User`: thêm mới, hoặc sửa `role` và `isLocked` |
+| Admin sửa user | `User` theo `id` | `User.role`, `User.isLocked` |
 
 Không thêm bảng hay cột; `schema.prisma` giữ nguyên. Các truy vấn đọc đều dùng chỉ mục có sẵn (khóa chính `id`, chỉ mục duy nhất `User_email_key`). Phía trình duyệt chỉ lưu đúng một cookie.
 
@@ -260,6 +282,9 @@ Không thêm bảng hay cột; `schema.prisma` giữ nguyên. Các truy vấn đ
 | Đăng ký thành công nhưng mạng rớt trước khi client nhận phản hồi | Client thử lại sẽ nhận 409; client gợi ý người dùng đăng nhập |
 | Chạy seed hai lần | Không tạo trùng; lần sau chỉ đảm bảo `role = ADMIN` |
 | `ADMIN_EMAIL` trùng một tài khoản sinh viên đã đăng ký | Seed nâng tài khoản đó lên Admin, giữ nguyên mật khẩu |
+| Admin tự khóa hoặc tự đổi quyền của mình | 403 `FORBIDDEN` (mục 5.9) |
+| Admin sửa một user không tồn tại | 404 `NOT_FOUND` |
+| `PATCH /api/admin/users/:id` với body rỗng hoặc `role` lạ | 400 `VALIDATION_ERROR` |
 
 ## 8. Xử lý lỗi và chạy lại
 
@@ -287,9 +312,10 @@ Theo Q6: Vitest + Supertest, chạy trên PostgreSQL thật trong Docker. Mỗi 
 1. **Đăng ký:** trả 201 và cookie có `HttpOnly`, `SameSite=Lax`; gửi kèm `role: "ADMIN"` vẫn thành `STUDENT`; trùng email, kể cả khác hoa thường, trả 409; mật khẩu 24 chữ "ệ" (72 byte) được chấp nhận, 25 chữ (75 byte) bị 400.
 2. **Đăng nhập:** đúng thì 200 kèm cookie; sai mật khẩu và email lạ trả cùng 401 `INVALID_CREDENTIALS`; bị khóa mà đúng mật khẩu thì 403, sai mật khẩu thì 401; đăng ký bằng mật khẩu dạng dựng sẵn (NFC) rồi đăng nhập bằng dạng tổ hợp (NFD) vẫn được.
 3. **`requireAuth`:** không có cookie thì 401; sửa một ký tự của token thì 401 và cookie bị xóa; token hết hạn hoặc `alg: none` thì 401; bị khóa sau khi đăng nhập thì 403; đổi role trong DB thì `/me` trả role mới ngay.
-4. **`requireRole`:** STUDENT gọi route chỉ dành cho ADMIN thì nhận 403 `FORBIDDEN`.
+4. **`requireRole`:** STUDENT hoặc TEACHER gọi `PATCH /api/admin/users/:id` thì nhận 403 `FORBIDDEN`.
 5. **Đổi mật khẩu:** sai mật khẩu hiện tại thì 400 (không phải 401); đúng thì 204, sau đó đăng nhập bằng mật khẩu mới được, mật khẩu cũ bị 401.
 6. **Seed:** chạy hai lần vẫn chỉ có một Admin; email đã là sinh viên thì thành Admin và giữ mật khẩu.
+7. **API Admin:** khóa một user thì request kế tiếp của người đó nhận 403 `ACCOUNT_LOCKED`; cấp `TEACHER` thì `/me` của người đó trả role mới ngay; Admin tự sửa mình thì 403; `id` không tồn tại thì 404.
 
 ## 11. Chuẩn bị cho bước viết code
 
@@ -299,11 +325,12 @@ Theo Q6: Vitest + Supertest, chạy trên PostgreSQL thật trong Docker. Mỗi 
 | --- | --- |
 | `server/src/lib/auth.ts` | Hash và so mật khẩu, ký và kiểm tra JWT, đặt và xóa cookie, `requireAuth`, `requireRole` |
 | `server/src/lib/errors.ts` | Lớp lỗi có `code` và middleware lỗi (mục 3, mục 8) |
-| `server/src/modules/auth/routes.ts` | 5 endpoint ở mục 2 |
-| `server/src/index.ts` | Gắn phần đọc cookie, router `/api/auth`, middleware lỗi |
+| `server/src/modules/auth/routes.ts` | 5 endpoint `/api/auth/*` ở mục 2 |
+| `server/src/modules/admin/routes.ts` | `PATCH /api/admin/users/:id` (mục 5.9) |
+| `server/src/index.ts` | Gắn phần đọc cookie, router `/api/auth` và `/api/admin`, middleware lỗi |
 | `server/prisma/seed.ts`, `server/prisma.config.ts` | Seed Admin (mục 5.8) |
 | `server/.env.example` | `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `NODE_ENV` |
-| `shared/src/auth.ts`, `shared/src/errors.ts`, `shared/src/index.ts` | Schema ở mục 3; **cần Nhật đồng ý** |
+| `shared/src/auth.ts`, `shared/src/errors.ts`, `shared/src/index.ts` | Schema ở mục 3; Nhật xác nhận khi review PR |
 
 **Việc cần chọn ở bước viết code**, mỗi việc sẽ có 2–3 phương án để chọn:
 
@@ -312,12 +339,13 @@ Theo Q6: Vitest + Supertest, chạy trên PostgreSQL thật trong Docker. Mỗi 
 - Cách đọc cookie từ request.
 - Cách dựng test: thêm Vitest và Supertest (đã chốt ở Q6), tách `src/app.ts` khỏi `index.ts` để test gọi app mà không mở cổng, và thêm PostgreSQL vào CI.
 
-## 12. Cần xem khi duyệt
+## 12. Kết quả duyệt (04/11/2026)
 
-Những điểm dưới đây chưa có trong các quyết định đã chốt, nên tài liệu đang tạm dùng một mặc định. Đồng ý thì giữ, không thì sửa trước khi viết code.
-
-1. **Tự đăng nhập sau khi đăng ký** (mục 5.1). Cách khác: đăng ký xong bắt đăng nhập lại.
-2. **Quy tắc mật khẩu:** chỉ yêu cầu ít nhất 8 ký tự, không bắt buộc có chữ hoa, chữ số hay ký tự đặc biệt. NIST SP 800-63B khuyên không ép các quy tắc tổ hợp kiểu này.
-3. **Họ tên:** đăng ký chỉ có email và mật khẩu, vì bảng `User` chưa có cột tên (đúng mục 8.1 của tài liệu đề tài). Nếu muốn hiện họ tên, ví dụ ở danh sách thành viên lớp, thì phải thêm cột, tức sửa schema và cần cả nhóm đồng ý. Nên quyết ngay, vì form đăng ký của Nhật phụ thuộc vào điểm này.
-4. **Làm sớm `PATCH /api/admin/users/:id`** (Admin đổi `role` và `isLocked`) ngay trong nhánh này? Tuần này đã cần tài khoản Giảng viên để thử CRUD khóa học, trong khi API Admin dự kiến làm ở tuần 7. Nếu không làm sớm thì tạm đổi role bằng Prisma Studio (`npx prisma studio`).
-5. **Định dạng lỗi ở mục 3** và file mới `shared/src/errors.ts`. File này chưa có trong cấu trúc ở `01-kien-truc-du-an.md` mục 3, nên cần bạn và Nhật đồng ý. Nếu đồng ý thì cập nhật mục 3 của file đó trước khi viết code.
+| Điểm | Kết quả |
+| --- | --- |
+| Tự đăng nhập sau khi đăng ký (mục 5.1) | Giữ |
+| Mật khẩu chỉ cần ít nhất 8 ký tự, không ép có chữ hoa, chữ số, ký tự đặc biệt | Giữ. NIST SP 800-63B khuyên không ép các quy tắc tổ hợp kiểu này |
+| Họ tên khi đăng ký | Chưa thu; bảng `User` giữ nguyên. Muốn thêm sau thì chỉ cần một migration thêm cột được phép để trống |
+| `PATCH /api/admin/users/:id` | Làm sớm trong nhánh này; luồng ở mục 5.9 (duyệt bổ sung, gồm quy tắc Admin không tự sửa mình) |
+| Thư viện | bcryptjs 3.0.3, jose 6.2.13, cookie-parser 1.4.7; chọn bản đã phát hành hơn 2 tuần |
+| Định dạng lỗi (mục 3) | Theo mục 3, schema ở `shared/src/errors.ts`; đã thêm file này vào cấu trúc ở `01-kien-truc-du-an.md` mục 3 |
