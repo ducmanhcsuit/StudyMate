@@ -7,7 +7,9 @@
     "build": "prisma generate && tsc",
     "start": "node --env-file=.env dist/index.js",
     "typecheck": "prisma generate && tsc --noEmit",
-    "db:migrate": "prisma migrate dev"
+    "test": "prisma generate && vitest run",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
