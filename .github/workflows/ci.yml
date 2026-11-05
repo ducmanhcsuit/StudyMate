@@ -18,6 +18,33 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
+  # Test server (Vitest + Supertest) chạy trên PostgreSQL thật, cùng image với docker-compose.yml.
+  # Test tự tạo database studymate_test và áp migration (server/test/global-setup.ts).
+  server-test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: studymate
+          POSTGRES_PASSWORD: studymate
+          POSTGRES_DB: studymate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U studymate"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test -w server
+
   ai:
     runs-on: ubuntu-latest
     defaults:
